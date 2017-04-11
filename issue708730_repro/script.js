@@ -218,11 +218,21 @@ let texParam = gl.getUniformLocation(p1, "tex");
 gl.uniform1i(texParam, 0);
 
 function draw() {
+
     gl.bindFramebuffer(gl.FRAMEBUFFER, fb0);
     gl.drawBuffers([ gl.COLOR_ATTACHMENT0 ]);
     gl.viewport(0, 0, 128, 128);
     gl.depthMask(gl.TRUE);
-    gl.clearBufferfv(gl.COLOR, 0, [0.25, 0.25, 0.25, 1.0]);
+    // an 'oversized' Float32Array with the actual clear
+    // color (0.25, 0.25, 0.25, 1.0) in the middle
+    let fp32 = new Float32Array([
+        1.0, 0.0, 0.0, 1.0,
+        0.25, 0.25, 0.25, 1.0,
+        0.0, 1.0, 0.0, 1.0
+    ]);
+    // call clearBufferfv with the Float32Array and and offset
+    // to find the clear color (this seems to be broken in Chrome)
+    gl.clearBufferfv(gl.COLOR, 0, fp32, 4);
     gl.clearBufferfi(gl.DEPTH_STENCIL, 0, 1.0, 0);
     
     gl.depthFunc(gl.LEQUAL);
